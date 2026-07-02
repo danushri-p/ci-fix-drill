@@ -9,6 +9,7 @@ on:
 jobs:
   install:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -21,16 +22,21 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+
+    # Wait for the install job to complete successfully before running tests.
+    # This fixes the workflow sequencing issue found in the CI pipeline.
     needs: install
 
     steps:
-      # Added because each GitHub Actions job runs on a fresh machine
+      # Each GitHub Actions job runs on a fresh virtual machine,
+      # so we must check out the repository again.
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: '18'
 
+      # Install dependencies again because jobs do not share node_modules.
       - name: Install dependencies
         run: npm ci
 
